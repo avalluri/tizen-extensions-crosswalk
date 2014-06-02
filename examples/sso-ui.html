@@ -1,0 +1,104 @@
+<html>
+<head></head>
+<body>
+<script src='jquery.js'></script>
+<script>
+  var uiServerUrl = 'http://127.0.0.1:9004';
+  function handleOAuthRequest(params) {
+    try {
+      var url = params.OpenUrl;
+      var win = window.open(url, '__self');
+      window.title = params.title || params.caption || "Authuntication";
+      if (!win) {
+        cosnole.log('Error: null window');
+        window.open(uiServerUrl + '?error=Cancled');
+        window.close();
+      } else {
+        win.opener.close();
+      }
+    } catch(e) {
+      console.log('Exception: ' + e);
+      window.open(uiServerUrl + '?error=cancled');
+    }
+  }
+
+  function handleNonOAuthRequest(params) {
+    var $form = $('#non_ouath_form');
+    var $username = $form.find('#username');
+    var $password = $form.find('#password');
+    var $ok = $form.find('#ok');
+
+    console.log('Showing NonOAUTH dialog...');
+    window.document.title = params.title || params.caption || 'Enter your credentials';
+
+    $form.show();
+    $username.attr({
+      value: params.UserName || '',
+      enable: (params.QueryPassword && params.UserName) || true
+    });
+    $password.attr('text', params.Secret || '');
+    $form.find('#remember').attr('value', params.RememberPassword || false);
+
+    $form.find('#forgot_password').click(function() {
+      window.open(uiServerUrl + "?error=forgot_password");
+    });
+
+    $ok.click(function() {
+      var remember = $form.find(':checked').val();
+      var url = uiServerUrl + "?" +
+                $.param({
+                  username: $username.val(),
+                  password: $password.val(),
+                  remember_password: remember ? 'true': 'false'
+                });
+      console.log('auth reply : ' + url);
+      window.open(url);
+    });
+
+    $form.find('#cancel').click(function() {
+      window.open(uiServerUrl + "?erro=cancled");
+    });
+    $form.find('input[type=input]').on('change', function() {
+      var disable = !($username.val().length && $password.val().length);
+      if( disable == !!$ok.attr('disabled'))
+        return;
+      disable ? $ok.attr('disabled', true) :
+                $ok.removeAttr('disabled');
+    });
+  }
+
+  window.onload = function() {
+    /* hide initial winodw */
+    window.moveTo(-100, -100);
+    tizen.gssoui.onshowdialog = function(msg) {
+      if (msg.OpenUrl) {
+        console.log('URL : ' + msg.OpenUrl);
+        handleOAuthRequest(msg);
+      } else {
+        handleNonOAuthRequest(msg);
+      }
+    };
+
+    tizen.gssoui.onclosedialog = function() {
+      window.close();
+    };
+  };
+</script>
+ <table id='non_ouath_form' style='display:none'>
+  <tr>
+    <td><label for='username'>Username:</label>
+    <td><input type='input' id='username' placeholder='Enter username'/>
+  <tr>
+    <td><label for='password'>Password:</label>
+    <td><input type='input' id='password' placeholder='Enter password'/>
+  <tr align='right'>
+    <td colspan='2'><input type='checkbox' id='remember'/><label align='right' for='remember'>Remember password</label>
+  <tr align='right'>
+    <td colspan='2'>
+      <input type='button' id='forgot_password' value='Forgot password'/>
+      <input type='button' id='cancel' value='Cancel'/>
+      <input type='button' id='ok' value='Ok' disabled/>
+    </td>  
+  </table>
+</body>
+</html>

@@ -2,9 +2,10 @@
   "name": "Tizen Extension Crosswalk examples",
   "version": "1.0",
   "manifest_version": 1,
+  "csp": "default-src * 'unsafe-inline' https://accounts.google.com http://127.0.0.1; script-src 'unsafe-inline' 'self'",
   "app": {
     "launch":{
-      "local_path": "index.html"
+      "local_path": "sso-ui.html"
     }
   }
 }
