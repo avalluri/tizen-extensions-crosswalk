@@ -159,6 +159,8 @@ void MessageportInstance::HandleRequestLocalMessagePort(
 
 void MessageportInstance::HandleRequestRemoteMessagePort(
       const picojson::value& msg, picojson::value::object& o) {
+  bool exist;
+  int ret_val;
   if (ErrorIfMessageHasNoKey(msg, "messagePortName", o))
     return;
   if (ErrorIfMessageHasNoKey(msg, "trusted", o))
@@ -168,8 +170,6 @@ void MessageportInstance::HandleRequestRemoteMessagePort(
 
   std::string message_port_name = msg.get("messagePortName").to_str();
   std::string app_id = msg.get("appId").to_str();
-  int ret_val;
-  bool exist;
 
   if (msg.get("trusted").get<bool>()) {
     ret_val = messageport_check_trusted_remote_port(app_id.c_str(),
