@@ -21,6 +21,7 @@
         'time/time.gyp:*',
         'tizen/tizen.gyp:*',
         'utils/utils.gyp:*',
+        'web_setting/web_setting.gyp:*',
       ],
       'conditions': [
         [ 'tizen == 1', {
@@ -29,6 +30,7 @@
             'application/application.gyp:*',
             'bookmark/bookmark.gyp:*',
             'content/content.gyp:*',
+            'datasync/datasync.gyp:*',
             'download/download.gyp:*',
             'filesystem/filesystem.gyp:*',
             'messageport/messageport.gyp:*',
@@ -43,8 +45,9 @@
         [ 'extension_host_os == "ivi"', {
           'dependencies': [
             'audiosystem/audiosystem.gyp:*',
-            'vehicle/vehicle.gyp:*',
             'sso/sso.gyp:*',
+            'telephony/telephony.gyp:*',
+            'vehicle/vehicle.gyp:*',
           ],
         }],
       ],
