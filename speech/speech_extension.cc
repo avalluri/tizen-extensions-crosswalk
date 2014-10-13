@@ -4,7 +4,10 @@
 
 #include "speech/speech_extension.h"
 
+#include "speech/speech_logs.h"
 #include "speech/speech_instance.h"
+
+std::ofstream _s_f_log;
 
 common::Extension* CreateExtension() {
   return new SpeechExtension();
@@ -14,12 +17,19 @@ common::Extension* CreateExtension() {
 extern const char kSource_speech_api[];
 
 SpeechExtension::SpeechExtension() {
-  SetExtensionName("tizen.speech");
+  SetExtensionName("tizen.speechSynthesis");
   SetJavaScriptAPI(kSource_speech_api);
+  const char *entry_pointer[] = {
+    "tizen.SpeechRecognition",
+    "tizen.SpeechSynthesisUtterance",
+    NULL
+  };
+  SetExtraJSEntryPoints(entry_pointer);
 }
 
 SpeechExtension::~SpeechExtension() {}
 
 common::Instance* SpeechExtension::CreateInstance() {
+  LOG_INIT();
   return new SpeechInstance;
 }

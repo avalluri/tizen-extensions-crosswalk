@@ -3,38 +3,70 @@
 <title>Speech Example</title>
 <script>
 
+var sr = null;
+
 function toggleSTT() {
   var btn = document.getElementById('btn_stt');
+  var last_state = btn.value;
+  var log = document.getElementById('log');
+
+  if (sr == null) {
+    sr = new tizen.SpeechRecognition();
+    sr.onerror = function(err) {
+      log.innerHTML += '<b>ERROR:</b>' + err.message + '<br/>';
+
+      console.log("ERROR : " + err.message);
+      btn.value = last_state;
+    };
+
+    sr.onresult = function (r) {
+      log.innerHTML += 'Found Match</br>';
+    };
+
+    sr.lang = 'en-US';
+    sr.grammars.addFromString('winthorpe://player.grm');
+  }
 
   if (btn.value == 'Record Voice') {
+    sr.start();
     btn.value = 'Stop Recording';
-    tizen.speech.setCBListener(function(cmds) {
-      var output = document.getElementById('log');
-
-      var log = 'Found Commands: <br>';
-      for (var i = 0; i < cmds.length; i++) {
-        log += '    ' + cmds[i] + '<br>';
-      }
-
-      output.innerHTML += log;
-    });
   } else {
-    tizen.speech.setCBListener(null);
+    sr.stop();
     btn.value = 'Record Voice';
   }
 }
+
   
 function handleTextToSpeech() {
   var currentText = document.getElementById("inputText").value;
-  tizen.speech.vocalizeString(currentText);
+  var ut = new tizen.SpeechSynthesisUtterance(currentText);
+  ut.onerror = function (err) {
+    var log = document.getElementById('log');
+    log.innerHTML += "ERROR : " + err.message;
+  };
+  ut.onend = function() {
+    log.innerHTML += 'end of speaking utterance.';
+  };
+  ut.onstart = function() {
+    log.innerHTML += 'Started speaking utterance';
+  };
+  ut.onpause = function() {
+    log.innerHTML += 'Paused';
+  };
+  ut.onresume = function() {
+    log.innerHTML += 'Resumed';
+  };
+
+  tizen.speechSynthesis.speak(ut);
 }
 
 </script>
+
 </head>
 <body>
   <div name="input">
     <div id="instructionLabel">Type in some text to listen:</div>
-    <input type="text" id="inputText"><br>
+    <input type="text" id="inputText" value='w3c speech synthesis test'><br>
     <input id='btn_say' type='button' onClick='handleTextToSpeech()' value='Speak Out'/>
   </div>
   
