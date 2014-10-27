@@ -8,7 +8,7 @@
 %define _audiosystem_demo_package tizen-extensions-crosswalk-audiosystem-demo
 
 Name:       tizen-extensions-crosswalk
-Version:    0.102
+Version:    0.107
 Release:    0
 License:    BSD-3-Clause and Apache-2.0
 Group:      Development/Libraries
@@ -76,6 +76,8 @@ BuildRequires: python
 Requires:      crosswalk
 # For Content API
 Requires:      media-thumbnail-server
+# For Datasync API
+Requires:      oma-ds-agent
 
 %description
 Tizen Web APIs implemented using Crosswalk.

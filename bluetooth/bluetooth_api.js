@@ -394,22 +394,23 @@ _addConstProperty(exports, 'deviceService', exports.deviceService);
 var defaultAdapter = new BluetoothAdapter();
 
 exports.getDefaultAdapter = function() {
-  var msg = {
-    'cmd': 'GetDefaultAdapter'
-  };
-  var result = JSON.parse(extension.internal.sendSyncMessage(JSON.stringify(msg)));
+  if (!defaultAdapter.name) {
+    var msg = { 'cmd': 'GetDefaultAdapter' };
 
-  if (!result.error) {
-    _addConstProperty(defaultAdapter, 'name', result.name);
-    _addConstProperty(defaultAdapter, 'address', result.address);
-    _addConstProperty(defaultAdapter, 'powered', result.powered);
-    _addConstProperty(defaultAdapter, 'visible', result.visible);
+    var result = JSON.parse(extension.internal.sendSyncMessage(JSON.stringify(msg)));
 
-    if (result.hasOwnProperty('address') && result.address != '')
-      adapter.isReady = true;
-  } else {
-    adapter.isReady = false;
-    throw new tizen.WebAPIException(tizen.WebAPIException.UNKNOWN_ERR);
+    if (!result.error) {
+      _addConstProperty(defaultAdapter, 'name', result.name);
+      _addConstProperty(defaultAdapter, 'address', result.address);
+      _addConstProperty(defaultAdapter, 'powered', result.powered);
+      _addConstProperty(defaultAdapter, 'visible', result.visible);
+
+      if (result.hasOwnProperty('address') && result.address != '')
+        adapter.isReady = true;
+    } else {
+      adapter.isReady = false;
+      throw new tizen.WebAPIException(tizen.WebAPIException.UNKNOWN_ERR);
+    }
   }
 
   return defaultAdapter;
@@ -626,6 +627,14 @@ BluetoothAdapter.prototype.createBonding = function(address, successCallback, er
   if (adapter.checkServiceAvailability(errorCallback))
     return;
 
+  var index = adapter.indexOfDevice(adapter.known_devices, address);
+  if (index == -1) {
+    var error = new tizen.WebAPIError(tizen.WebAPIException.NOT_FOUND_ERR);
+    if (errorCallback)
+      errorCallback(error);
+    return;
+  }
+
   var msg = {
     'cmd': 'CreateBonding',
     'address': address
@@ -669,12 +678,20 @@ BluetoothAdapter.prototype.destroyBonding = function(address, successCallback, e
     throw new tizen.WebAPIError(tizen.WebAPIException.TYPE_MISMATCH_ERR);
   }
 
+  if (adapter.checkServiceAvailability(errorCallback))
+    return;
+
   if (!validateAddress(address)) {
     throw new tizen.WebAPIException(tizen.WebAPIException.TYPE_MISMATCH_ERR);
   }
 
-  if (adapter.checkServiceAvailability(errorCallback))
+  var index = adapter.indexOfDevice(adapter.known_devices, address);
+  if (index == -1) {
+    var error = new tizen.WebAPIError(tizen.WebAPIException.NOT_FOUND_ERR);
+    if (errorCallback)
+      errorCallback(error);
     return;
+  }
 
   var msg = {
     'cmd': 'DestroyBonding',
@@ -709,7 +726,7 @@ BluetoothAdapter.prototype.destroyBonding = function(address, successCallback, e
       // BlueZ backends update the device state automatically when catching dbus signals
       // A better approach would be to adapt backends instances to have a single JSON protocol.
       if (result.capi)
-        _addConstProperty(adapter.known_devices[i], 'isBonded', false);
+        adapter.known_devices.splice(i, 1);
 
       successCallback(cb_device);
     }
