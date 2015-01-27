@@ -8,7 +8,7 @@
 %define _audiosystem_demo_package tizen-extensions-crosswalk-audiosystem-demo
 
 Name:       tizen-extensions-crosswalk
-Version:    0.107
+Version:    0.143
 Release:    0
 License:    BSD-3-Clause and Apache-2.0
 Group:      Development/Libraries
@@ -41,11 +41,13 @@ BuildRequires: pkgconfig(libtzplatform-config)
 %if "%{profile}" == "ivi"
 BuildRequires: pkgconfig(automotive-message-broker)
 %endif
-# For IVI, it doesn't need sim package.
 %if "%{profile}" == "mobile"
 BuildRequires: pkgconfig(capi-telephony-sim)
 BuildRequires: pkgconfig(contacts-service2)
 BuildRequires: pkgconfig(libpcrecpp)
+BuildRequires: pkgconfig(sync-agent)
+# For Datasync API
+Requires:      oma-ds-agent
 %endif
 BuildRequires: pkgconfig(capi-web-favorites)
 BuildRequires: pkgconfig(capi-web-url-download)
@@ -64,7 +66,6 @@ BuildRequires: pkgconfig(pkgmgr)
 BuildRequires: pkgconfig(pkgmgr-info)
 BuildRequires: pkgconfig(pmapi)
 BuildRequires: pkgconfig(tapi)
-BuildRequires: pkgconfig(sync-agent)
 BuildRequires: pkgconfig(vconf)
 %if %{with wayland}
 BuildRequires: pkgconfig(wayland-client)
@@ -76,8 +77,6 @@ BuildRequires: python
 Requires:      crosswalk
 # For Content API
 Requires:      media-thumbnail-server
-# For Datasync API
-Requires:      oma-ds-agent
 
 %description
 Tizen Web APIs implemented using Crosswalk.
@@ -204,8 +203,7 @@ install -p -D %{name}.png %{buildroot}%{_desktop_icondir}/%{_system_info_demo_pa
 install -p -D %{name}.png %{buildroot}%{_desktop_icondir}/%{_audiosystem_demo_package}.png
 
 %files
-# TODO(rakuco): This causes problems on 2.1 when creating the package.
-# %license LICENSE
+%license LICENSE LICENSE.AL2
 %{_libdir}/%{name}/libtizen*.so
 
 %files -n %{_bluetooth_demo_package}
