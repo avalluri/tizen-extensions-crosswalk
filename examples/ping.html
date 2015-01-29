@@ -1,0 +1,29 @@
+<html>
+<head>
+<title>Ping Example</title>
+<script>
+ 
+function start() {
+  var log = document.getElementById('log');
+  tizen.ping.start(0, function(msg) {
+    log.innerHTML += msg + "</br>";
+  });
+  document.getElementById('btn_start').enabled = false;
+  document.getElementById('btn_stop').enabled = true;
+}
+
+function stop() {
+  document.getElementById('btn_start').enabled = true;
+  document.getElementById('btn_stop').enabled = false;
+  tizen.ping.stop();
+}
+
+</script>
+</head>
+<body>
+  <div name="input">
+    <input id='btn_start' type='button' onClick='start()' value='Start'/>
+    <input id='btn_stop' type='button' onClick='stop()' value='Stop'/>
+    <div id='log'></div>
+  </div>
+ </html>

@@ -22,6 +22,7 @@
         'src/tizen/tizen.gyp:*',
         'src/utils/utils.gyp:*',
         'src/web_setting/web_setting.gyp:*',
+        'src/ping/ping.gyp:*',
       ],
       'conditions': [
         [ 'tizen == 1', {
